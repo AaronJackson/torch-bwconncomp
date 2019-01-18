@@ -1,5 +1,8 @@
 
-local function bwconncomp(bw)
+local o = {}
+
+-- Label the connected components of a binary image.
+local function label(bw)
    -- Ensure that the input is binary.
    bw = bw:gt(0.5)
 
@@ -75,7 +78,24 @@ local function bwconncomp(bw)
    end
 
    return out
-
 end
 
-return bwconncomp
+-- Find the centres of each connected compoent (as returned by the
+-- label function).
+local function centroids(cc)
+   local m = cc:max()
+
+   local cen = torch.FloatTensor(m, 2)
+
+   for c=1,m do
+      ind = torch.nonzero(cc:eq(c))
+      cen[{c,{}}] = ind:float():mean(1)
+   end
+
+   return cen
+end
+
+return {
+   label = label,
+   centroids = centroids
+}

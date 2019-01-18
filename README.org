@@ -1,7 +1,10 @@
 * torch-bwconncomp
 
-Used to detect connected groups of pixels in a black and white image,
-with neighbourhood connectivity of four.
+Used to detect connected groups of pixels in a black and white image.
+
+- ~bwconncomp.label~ - Labels the connected components
+- ~bwconncomp.centroids~ - Identifies the centres (mean of pixels) of
+  the labelled components.
 
 ** Download
 
@@ -32,7 +35,7 @@ th> Z
 [torch.ByteTensor of size 8x8]
 
                                                                       [0.0031s]
-th> bwconncomp(Z)
+th> bwconncomp.label(Z)
   0   0   0   0   0   1   0   0
   2   0   3   3   3   0   0   0
   0   0   0   0   3   0   0   4
