@@ -18,19 +18,25 @@ local function label(bw)
    -- label to 1.
    local label = 1
 
-   for i=1,bw:size(1) do
-      for j=1,bw:size(2) do
-	 -- 2. If the pixel is a foreground pixel and it has not already
-	 -- been labelled, give it the current label and add it as the first
-	 -- element in the queue, then go to 3. If it is a background pixel
-	 -- or it has already been labelled, repeat 2 for the next pixel in
-	 -- the image.
-	 if bw[{i,j}] == 1 and out[{i,j}] == 0 then
-	    out[{i,j}] = label
-	    table.insert(Q, {i, j})
-	 else
-	    goto next_pixel
-	 end
+   local is = bw:size(1)
+   local js = bw:size(2)
+
+   local nz = bw:nonzero()
+
+   for ij=1,nz:size(1) do
+      local i, j = nz[{ij,1}], nz[{ij,2}]
+
+      -- 2. If the pixel is a foreground pixel and it has not already
+      -- been labelled, give it the current label and add it as the first
+      -- element in the queue, then go to 3. If it is a background pixel
+      -- or it has already been labelled, repeat 2 for the next pixel in
+      -- the image.
+      --
+      -- We don't need to check bw[{i,j}] == 1 because we are using
+      -- only the non zero components
+      if out[{i,j}] == 0 then
+	 out[{i,j}] = label
+	 Q[#Q+1] = {i, j}
 
 	 -- 3. Pop out an element from the queue and look at its
 	 -- neighbours. If a neighbour is a foreground pixel and is
@@ -44,36 +50,34 @@ local function label(bw)
 	    -- Check up
 	    if ii-1 > 1 and bw[{ii-1,jj}] == 1 and out[{ii-1,jj}] == 0 then
 	       out[{ii-1,jj}] = label
-	       table.insert(Q, {ii-1, jj})
+	       Q[#Q+1] = {ii-1, jj}
 	    end
 
 	    -- Check down
-	    if ii+1 < bw:size(1) and bw[{ii+1,jj}] == 1 and out[{ii+1,jj}] == 0 then
+	    if ii+1 < is and bw[{ii+1,jj}] == 1 and out[{ii+1,jj}] == 0 then
 	       out[{ii+1,jj}] = label
-	       table.insert(Q, {ii+1, jj})
+	       Q[#Q+1] = {ii+1, jj}
 	    end
 
 	    -- Check left
 	    if jj-1 > 1 and bw[{ii,jj-1}] == 1 and out[{ii,jj-1}] == 0 then
 	       out[{ii,jj-1}] = label
-	       table.insert(Q, {ii, jj-1})
+	       Q[#Q+1] = {ii, jj-1}
 	    end
 
 	    -- Check right
-	    if jj+1 < bw:size(2) and bw[{ii,jj+1}] == 1 and out[{ii,jj+1}] == 0 then
+	    if jj+1 < js and bw[{ii,jj+1}] == 1 and out[{ii,jj+1}] == 0 then
 	       out[{ii,jj+1}] = label
-	       table.insert(Q, {ii, jj+1})
+	       Q[#Q+1] = {ii, jj+1}
 	    end
 
 	    q = table.remove(Q, 1)
-	    ::continue::
 	 end
 
 	 -- 4. Go to 2 for the next pixel in the image and increment the
 	 -- current label by 1.
 	 label = label + 1
 
-	 ::next_pixel::
       end
    end
 
