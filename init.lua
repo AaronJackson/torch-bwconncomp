@@ -22,6 +22,7 @@ local function label(bw)
    local js = bw:size(2)
 
    local nz = bw:nonzero()
+   if nz:nElement() == 0 then goto zero_img end
 
    for ij=1,nz:size(1) do
       local i, j = nz[{ij,1}], nz[{ij,2}]
@@ -81,6 +82,7 @@ local function label(bw)
       end
    end
 
+   ::zero_img::
    return out
 end
 
